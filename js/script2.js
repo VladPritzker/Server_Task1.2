@@ -41,7 +41,7 @@ window.addEventListener('DOMContentLoaded', function () {
 
     // Timer
 
-    const deadline = '2022-06-11';
+    const deadline = '2023-03-08';
 
     function getTimeRemaining(endtime) {
         const t = Date.parse(endtime) - Date.parse(new Date()),
@@ -273,7 +273,7 @@ window.addEventListener('DOMContentLoaded', function () {
         const prevModalDialog = document.querySelector('.modal__dialog'); // мы создаем переменную и втавляем в нее елемент с классом modal__dialog 
 
         prevModalDialog.classList.add('hide');// Мы убераем этот елемент ( что бы убедиться что его нет на стр)
-        openModal();  //  мы показываем елемент 
+        openModal();  // мы открываем модельное окно (без modal__dialog)
 
         const thanksModal = document.createElement('div');
         thanksModal.classList.add('modal__dialog');  // то есть мы одни modal__dialog зменяем другим 
@@ -283,7 +283,7 @@ window.addEventListener('DOMContentLoaded', function () {
                 <div class="modal__title">${message}</div>
             </div>
         `;// в  class="model__close" data-close>х</div> x это спец симол который являеться крестиком для закрывания окна 
-        document.querySelector('.modal').append(thanksModal);
+        document.querySelector('.modal').append(thanksModal); // мы вставляем  в modal (форму) нашу новую форму 
         setTimeout(() => {
             thanksModal.remove(); // мы убераем нашу форму через 4 секунды 
             prevModalDialog.classList.add('show');
