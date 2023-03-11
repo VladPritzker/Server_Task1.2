@@ -307,7 +307,7 @@
 //             closeModal(); // закрываем модельное окно 
 //         }, 4000);
 //     }
-    
+
 // // fetch('https://jsonplaceholder.typicode.com/posts', { // Fetch API технология которая позволяет общаться с сервером
 //     //     method: "POST", // мы отправляем пост запрос на сервер и дальше с ним работам  
 //     //     body: JSON.stringify({name: "Alex"}), // мы перевожим json формат в обьект name: alex
@@ -322,16 +322,16 @@
 
 // ==========================================
 
-window.addEventListener('DOMContentLoaded', function() {
+window.addEventListener('DOMContentLoaded', function () {
 
     // Tabs
-    
-	let tabs = document.querySelectorAll('.tabheader__item'),
-		tabsContent = document.querySelectorAll('.tabcontent'),
-		tabsParent = document.querySelector('.tabheader__items');
 
-	function hideTabContent() {
-        
+    let tabs = document.querySelectorAll('.tabheader__item'),
+        tabsContent = document.querySelectorAll('.tabcontent'),
+        tabsParent = document.querySelector('.tabheader__items');
+
+    function hideTabContent() {
+
         tabsContent.forEach(item => {
             item.classList.add('hide');
             item.classList.remove('show', 'fade');
@@ -340,39 +340,39 @@ window.addEventListener('DOMContentLoaded', function() {
         tabs.forEach(item => {
             item.classList.remove('tabheader__item_active');
         });
-	}
+    }
 
-	function showTabContent(i = 0) {
+    function showTabContent(i = 0) {
         tabsContent[i].classList.add('show', 'fade');
         tabsContent[i].classList.remove('hide');
         tabs[i].classList.add('tabheader__item_active');
     }
-    
+
     hideTabContent();
     showTabContent();
 
-	tabsParent.addEventListener('click', function(event) {
-		const target = event.target;
-		if(target && target.classList.contains('tabheader__item')) {
+    tabsParent.addEventListener('click', function (event) {
+        const target = event.target;
+        if (target && target.classList.contains('tabheader__item')) {
             tabs.forEach((item, i) => {
                 if (target == item) {
                     hideTabContent();
                     showTabContent(i);
                 }
             });
-		}
+        }
     });
-    
+
     // Timer
 
     const deadline = '2022-06-11';
 
     function getTimeRemaining(endtime) {
         const t = Date.parse(endtime) - Date.parse(new Date()),
-            days = Math.floor( (t/(1000*60*60*24)) ),
-            seconds = Math.floor( (t/1000) % 60 ),
-            minutes = Math.floor( (t/1000/60) % 60 ),
-            hours = Math.floor( (t/(1000*60*60) % 24) );
+            days = Math.floor((t / (1000 * 60 * 60 * 24))),
+            seconds = Math.floor((t / 1000) % 60),
+            minutes = Math.floor((t / 1000 / 60) % 60),
+            hours = Math.floor((t / (1000 * 60 * 60) % 24));
 
         return {
             'total': t,
@@ -383,8 +383,8 @@ window.addEventListener('DOMContentLoaded', function() {
         };
     }
 
-    function getZero(num){
-        if (num >= 0 && num < 10) { 
+    function getZero(num) {
+        if (num >= 0 && num < 10) {
             return '0' + num;
         } else {
             return num;
@@ -447,7 +447,7 @@ window.addEventListener('DOMContentLoaded', function() {
     });
 
     document.addEventListener('keydown', (e) => {
-        if (e.code === "Escape" && modal.classList.contains('show')) { 
+        if (e.code === "Escape" && modal.classList.contains('show')) {
             closeModal();
         }
     });
@@ -475,11 +475,11 @@ window.addEventListener('DOMContentLoaded', function() {
             this.classes = classes;
             this.parent = document.querySelector(parentSelector);
             this.transfer = 27;
-            this.changeToUAH(); 
+            this.changeToUAH();
         }
 
         changeToUAH() {
-            this.price = this.price * this.transfer; 
+            this.price = this.price * this.transfer;
         }
 
         render() {
@@ -542,11 +542,28 @@ window.addEventListener('DOMContentLoaded', function() {
         failure: 'Что-то пошло не так...'
     };
 
-    forms.forEach(item => {
-        postData(item);
+    forms.forEach(item => { // мы берем forms и перебераем каждый елемент с формс и 
+        bindPostData(item);
     });
 
-    function postData(form) {
+    const postData = async (url, data) => { // async значит что наш код становиться снхронный 
+        //(выполняеться по очереди(ждет когда выполниться действие а потом запускает след код))
+        // мы настраиваем наш запрос и отправляем на сервер 
+        // потом получаем ответ и трансвормируем его в json формат 
+        const res = await fetch(url, { // await используется в паре с async (их нужно использовать вместе)
+            // await значит что мы ждем пока выполниться действие перед которым мы поставили await 
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: await data // await значит что мы ждем пока выполниться действие перед которым мы поставили await 
+            // если мы предполагаем что может быть задержка то нужно использовать await что бы убедиться 
+            //что код дождеться выполнения нашей функции перед тем как пойти далее 
+        });
+        return await res.json; // трансформировать ответ с сервера в json
+    };
+
+    function bindPostData(form) {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
 
@@ -557,32 +574,41 @@ window.addEventListener('DOMContentLoaded', function() {
                 margin: 0 auto;
             `;
             form.insertAdjacentElement('afterend', statusMessage);
-        
+
             const formData = new FormData(form);
+  
+            // const object = {}; // это мы делаем что бы приобразовать наши данные в обьект
+            // formData.forEach(function (value, key) {  
+            //     object[key] = value;
+            // });
 
-            const object = {};
-            formData.forEach(function(value, key){
-                object[key] = value;
-            });
+            const json = JSON.stringify(Object.fromEntries(formData.entries())); 
+
+            // Entries - мы превращаем каждый елемент в нашем обьекте в массив
+            // fromEntries - мы превращаем наш массив с массивами (елементами с обьекта) в обьект
+            // JSON.stringify - мы превращаем наш обьект в json file 
 
 
-            fetch('server1.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(object)
 
-            }).then(data => data.text())
-            .then(data => {
-                console.log(data);
-                showThanksModal(message.success);
-                statusMessage.remove();
-            }).catch(() => {
-                showThanksModal(message.failure);
-            }).finally(() => {
-                form.reset();
-            });
+            // fetch('server.php', {
+            //         method: 'POST',
+            //         headers: {
+            //             'Content-Type': 'application/json'
+            //         },
+            //         body: JSON.stringify(object)
+
+            //     })
+            postData('http://localhost:3000/requests', json) // мы отправляем наш json на сервер 
+                // .then(data => data.text())
+                .then(data => {
+                    console.log(data);
+                    showThanksModal(message.success);
+                    statusMessage.remove();
+                }).catch(() => {
+                    showThanksModal(message.failure);
+                }).finally(() => {
+                    form.reset();
+                });
         });
     }
 
@@ -608,4 +634,10 @@ window.addEventListener('DOMContentLoaded', function() {
             closeModal();
         }, 4000);
     }
+    fetch('http://localhost:3000/menu')
+        //  fetch('db.json')
+        .then(data => data.json()) // что мы бурум json data и приврааем его в обычный JS object 
+        .then(res => console.log(res)); // мы просто берем эти данные и выводим их в консоль 
 });
+
+
